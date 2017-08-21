@@ -83,10 +83,10 @@ func consumeDatabase(g *Gatherer, driver, connectionString, dbSchema, dbTable st
 	for {
 		msg := <-g.receiveQueue
 		_, err := db.Exec(`
-			insert into [$1].[$2] (Server, LogLevel, Time, Message)
-			values ($3, $4, $5, $6);`,
-			dbSchema, dbTable,
-			msg.GetServer(), msg.GetLogLevel(), msg.GetTime(), msg.GetMessage())
+			insert into `+fmt.Sprintf("[%v].[%v]", dbSchema, dbTable)+
+			` (Server, LogLevel, Time, Message)
+			values ($1, $2, $3, $4);`,
+			msg.GetServer(), msg.GetLogLevel(), msg.GetTime().String(), msg.GetMessage())
 		if err != nil {
 			log.Warnln("Failed to insert message", msg, err)
 		}
