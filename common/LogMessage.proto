@@ -8,10 +8,10 @@ message LogMessage {
     string message = 1;
     google.protobuf.Timestamp time = 2;
     enum LogLevel {
-        FATAL = 0;
-        WARN = 20;
-        INFO = 40;
-        DEBUG = 60;
+        INFO = 0;
+        WARN = 1;
+        FATAL = 2;
+        DEBUG = 3;
     }
     LogLevel logLevel = 3;
     string server = 4;
