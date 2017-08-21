@@ -86,7 +86,7 @@ func consumeDatabase(g *Gatherer, driver, connectionString, dbSchema, dbTable st
 			insert into `+fmt.Sprintf("[%v].[%v]", dbSchema, dbTable)+
 			` (Server, LogLevel, Time, Message)
 			values ($1, $2, $3, $4);`,
-			msg.GetServer(), msg.GetLogLevel(), msg.GetTime().String(), msg.GetMessage())
+			msg.GetServer(), fmt.Sprintf("%v", msg.GetLogLevel()), msg.GetTime().String(), msg.GetMessage())
 		if err != nil {
 			log.Warnln("Failed to insert message", msg, err)
 		}
