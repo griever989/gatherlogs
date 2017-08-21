@@ -1,2 +1,4 @@
 go get -u github.com/golang/protobuf/protoc-gen-go
 protoc --go_out=. .\common\*.proto
+go build .\gather\gatherer.go
+go build .\send\sender.go

@@ -7,4 +7,12 @@ package common;
 message LogMessage {
     string message = 1;
     google.protobuf.Timestamp time = 2;
+    enum LogLevel {
+        FATAL = 0;
+        WARN = 20;
+        INFO = 40;
+        DEBUG = 60;
+    }
+    LogLevel logLevel = 3;
+    string server = 4;
 }
