@@ -3,8 +3,9 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"net/rpc"
+	"time"
 
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/griever989/gatherlogs/common"
 	"github.com/mattn/go-colorable"
 )
@@ -26,7 +27,7 @@ func configLogger() {
 
 func testSend(client *rpc.Client) {
 	var response bool
-	msg := common.LogMessage{Message: "test", Time: &timestamp.Timestamp{}}
+	msg := getTestMessage()
 	err := client.Call("Gatherer.Send", &msg, &response)
 	if err != nil {
 		log.Fatal("failed to send ", err)
@@ -34,10 +35,22 @@ func testSend(client *rpc.Client) {
 	log.Debug("sent", msg)
 }
 
+func getTestMessage() common.LogMessage {
+	localTime, err := ptypes.TimestampProto(time.Time.Local(time.Now()))
+	if err != nil {
+		log.Warnln(err)
+	}
+	return common.LogMessage{
+		Message:  "test",
+		Time:     localTime,
+		LogLevel: common.LogMessage_DEBUG,
+		Server:   "srv"}
+}
+
 func testSendMulti(client *rpc.Client) {
 	var response bool
 	msgs := make([]common.LogMessage, 20)
-	msg := common.LogMessage{Message: "test", Time: &timestamp.Timestamp{}}
+	msg := getTestMessage()
 	for i := range msgs {
 		msgs[i] = msg
 	}

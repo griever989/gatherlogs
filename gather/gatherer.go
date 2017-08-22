@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/griever989/gatherlogs/common"
 	"github.com/mattn/go-colorable"
 )
@@ -86,7 +87,7 @@ func consumeDatabase(g *Gatherer, driver, connectionString, dbSchema, dbTable st
 			insert into `+fmt.Sprintf("[%v].[%v]", dbSchema, dbTable)+
 			` (Server, LogLevel, Time, Message)
 			values ($1, $2, $3, $4);`,
-			msg.GetServer(), fmt.Sprintf("%v", msg.GetLogLevel()), msg.GetTime().String(), msg.GetMessage())
+			msg.GetServer(), fmt.Sprintf("%v", msg.GetLogLevel()), ptypes.TimestampString(msg.GetTime()), msg.GetMessage())
 		if err != nil {
 			log.Warnln("Failed to insert message", msg, err)
 		}
@@ -136,12 +137,12 @@ func configLogger() {
 }
 
 func main() {
-	consumerType := flag.String("consumer", "cli", "-consumer=( cli | database )")
-	connectionString := flag.String("connectionString", "", "-connectionString=<connection-string>")
-	dbDriver := flag.String("driver", "mssql", "-driver=( mssql | <driver-name> ) -- If the driver name you want is not present, you can provide it, but you need to 'go get' the package yourself on the machine running it")
-	dbSchema := flag.String("schema", "dbo", "-schema=<db-schema-name>")
-	dbTable := flag.String("table", "gatherer", "-table=<db-table-name>")
-	dbCreate := flag.Bool("dbCreate", false, "-dbCreate")
+	consumerType := flag.String("consumer", "cli", "( cli | database )")
+	connectionString := flag.String("connectionString", "", "<connection-string>")
+	dbDriver := flag.String("driver", "mssql", "( mssql | <driver-name> ) -- If the driver name you want is not present, you can provide it, but you need to 'go get' the package yourself on the machine running it")
+	dbSchema := flag.String("schema", "dbo", "<db-schema-name>")
+	dbTable := flag.String("table", "gatherer", "<db-table-name>")
+	dbCreate := flag.Bool("dbCreate", false, "If enabled, creates the database pointed to by the connection string, schema, and table, if it does not exist")
 
 	flag.Parse()
 
