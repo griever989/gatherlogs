@@ -54,7 +54,7 @@ func serve() *Gatherer {
 	rpc.HandleHTTP()
 	l, e := net.Listen(protocol, port)
 	if e != nil {
-		log.Fatal("failed to bind ", port, e)
+		log.Panicln("failed to bind ", port, e)
 	}
 	log.Info("bound ", port)
 	go http.Serve(l, nil)
@@ -72,11 +72,11 @@ func consumeCli(g *Gatherer) {
 func consumeDatabase(g *Gatherer, driver, connectionString, dbSchema, dbTable string, dbCreate bool) {
 	db, err := sql.Open(driver, connectionString)
 	if err != nil {
-		log.Fatalln("failed to open db", driver, connectionString, err)
+		log.Panicln("failed to open db", driver, connectionString, err)
 	}
 	if !dbExists(db, dbSchema, dbTable) {
 		if !dbCreate {
-			log.Fatalln("database", dbSchema, dbTable, "does not exist and -dbCreate is not set. Provide -dbSchema and -dbTable as well as -dbCreate if you want to create the table automatically")
+			log.Panicln("database", dbSchema, dbTable, "does not exist and -dbCreate is not set. Provide -dbSchema and -dbTable as well as -dbCreate if you want to create the table automatically")
 		}
 		createDbTable(db, dbSchema, dbTable)
 	}
@@ -97,7 +97,8 @@ func consumeDatabase(g *Gatherer, driver, connectionString, dbSchema, dbTable st
 func dbExists(db *sql.DB, dbSchema, dbTable string) bool {
 	rows, err := db.Query("select * from INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA = $1 and TABLE_NAME = $2", dbSchema, dbTable)
 	if err != nil {
-		log.Fatalln("failed to check for existence of", dbSchema, dbTable, err)
+		log.Warnln("failed to check for existence of", dbSchema, dbTable, err)
+		return false
 	}
 	if rows.Next() {
 		return true
@@ -117,7 +118,7 @@ func createDbTable(db *sql.DB, dbSchema, dbTable string) {
 			Message nvarchar(max) NULL
 		);`)
 	if err != nil {
-		log.Fatalln("failed to create table", fullTable, err)
+		log.Panicln("failed to create table", fullTable, err)
 	}
 	log.Infoln("created table", dbSchema, dbTable)
 
@@ -125,7 +126,7 @@ func createDbTable(db *sql.DB, dbSchema, dbTable string) {
 		"create clustered index IX_primary on " + fullTable + " (Time, Id);")
 
 	if err != nil {
-		log.Fatalln("failed to create index", dbSchema, dbTable, err)
+		log.Panicln("failed to create index", dbSchema, dbTable, err)
 	}
 	log.Infoln("created index", dbSchema, dbTable)
 }
@@ -155,7 +156,7 @@ func main() {
 	case "database":
 		consumeDatabase(g, *dbDriver, *connectionString, *dbSchema, *dbTable, *dbCreate)
 	default:
-		log.Fatal("unrecognized consumer value ", *consumerType)
+		log.Fatalln("unrecognized consumer value ", *consumerType)
 	}
 
 }
