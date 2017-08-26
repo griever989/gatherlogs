@@ -1,4 +1,8 @@
+make sure your GOPATH is set up
+make sure %GOPATH%/bin is on your PATH
+install protoc and make sure it's on your PATH
 go get -u github.com/golang/protobuf/protoc-gen-go
 protoc --go_out=. .\common\*.proto
+go get ./...
 go build .\gather\gatherer.go
 go build .\send\sender.go
