@@ -1,8 +1,14 @@
-make sure your GOPATH is set up
+0. Make sure your GOPATH is set up
+
+1. (Optional) - Compile protobuf messages (only need this if you are changing the message format)
 make sure %GOPATH%/bin is on your PATH
 install protoc and make sure it's on your PATH
-go get -u github.com/golang/protobuf/protoc-gen-go
-protoc --go_out=. .\common\*.proto
-go get ./...
-go build .\gather\gatherer.go
-go build .\send\sender.go
+`go get -u github.com/golang/protobuf/protoc-gen-go`
+`protoc --go_out=. .\common\*.proto`
+
+2. Get dependencies
+`go get ./...`
+
+3. Build
+`go build .\gather\gatherer.go`
+`go build .\send\sender.go`
